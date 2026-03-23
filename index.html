@@ -200,19 +200,19 @@
         const chapters = [
             { num: "1",    file: "chapters/1.md",    title: "仪器故障",   preview: "深空探测器网络报告异常。",           part: "Part I · 噪声" },
             { num: "2",    file: "chapters/2.md",    title: "非局域",     preview: "后面发生的事情会影响前面的意义。",     part: null },
-            { num: "2.5",  file: "chapters/2.5.md",  title: "河",         preview: "镇上有条河，美但怪异。",             part: null, manuscript: true },
+            { num: "2.5",  file: "chapters/2.5.md",  title: "睡前故事",   preview: "不对，这个人不会这么说话。",         part: null, manuscript: true },
             { num: "3",    file: "chapters/3.md",    title: "强语境敏感", preview: "测量结果不应取决于你阅读的顺序。",     part: null },
             { num: "4",    file: "chapters/4.md",    title: "出发",       preview: "飞船载着五个不同的认知世界出发了。",   part: "Part II · 航行" },
             { num: "5",    file: "chapters/5.md",    title: "死讯",       preview: "收到消息时，她已经走了几天了。",       part: null },
-            { num: "5.5",  file: "chapters/5.5.md",  title: "倾听",       preview: "河是活的。不是生物学意义上的活。",     part: null, manuscript: true },
+            { num: "5.5",  file: "chapters/5.5.md",  title: "退稿",       preview: "故事不是我决定的，我只是在听。",       part: null, manuscript: true },
             { num: "6",    file: "chapters/6.md",    title: "接近",       preview: "数据会因为谁在读而变化。",             part: null },
-            { num: "6.5",  file: "chapters/6.5.md",  title: "丈量",       preview: "每一次测量似乎都在伤害河。",           part: null, manuscript: true },
+            { num: "6.5",  file: "chapters/6.5.md",  title: "两种修改",   preview: "语法完美但是是死的，你知道吗？",       part: null, manuscript: true },
             { num: "7",    file: "chapters/7.md",    title: "边界",       preview: "现实开始表现出叙事性。",               part: "Part III · 接触" },
             { num: "8",    file: "chapters/8.md",    title: "暴力",       preview: "有什么东西在被伤害。",                 part: null },
-            { num: "8.5",  file: "chapters/8.5.md",  title: "裂缝",       preview: "河开始讲一个大坝从未建造的故事。",     part: null, manuscript: true },
+            { num: "8.5",  file: "chapters/8.5.md",  title: "争吵",       preview: "你其实也有，你只是不愿意用。",         part: null, manuscript: true },
             { num: "9",    file: "chapters/9.md",    title: "母语",       preview: "他逃了一辈子的东西，是唯一的桥梁。",   part: null },
             { num: "10",   file: "chapters/10.md",   title: "翻译",       preview: "翻译本身就是切割和命名的行为。",       part: "Part IV · 抉择" },
-            { num: "10.5", file: "chapters/10.5.md", title: "河岸",       preview: "手稿在这里断了——中间一个句子。",       part: null, manuscript: true },
+            { num: "10.5", file: "chapters/10.5.md", title: "最后一页",   preview: "我知道结局。但我没有权写它。",         part: null, manuscript: true },
             { num: "11",   file: "chapters/11.md",   title: "代价",       preview: "他踏入了母亲没踏入的河流。",           part: null },
             { num: "12",   file: "chapters/12.md",   title: "未完",       preview: "他写下了母亲手稿的结局。",             part: null }
         ];
@@ -237,7 +237,7 @@
             if (ch.manuscript) cls += ' manuscript';
             if (!ch.ready) cls += ' upcoming';
             a.className = cls;
-            const label = ch.manuscript ? '手稿 ' + ch.num : '第' + ch.num.replace('.5','') + '章';
+            const label = ch.manuscript ? '回忆 ' + ch.num : '第' + ch.num.replace('.5','') + '章';
             const statusHtml = ch.ready ? '' : '<span class="ch-status">待写</span>';
             a.innerHTML = '<span class="ch-num">' + label + '</span><span class="ch-title">' + ch.title + '</span><span class="ch-preview">' + ch.preview + '</span>' + statusHtml;
             list.appendChild(a);
@@ -254,7 +254,7 @@
                     document.getElementById('content').innerHTML = '<h1>' + ch.title + '</h1><p style="text-indent:0; color: var(--text-dim);">这一章还在写……</p>';
                     document.getElementById('reader').classList.add('active');
                     document.body.classList.add('reading');
-                    const label = ch.manuscript ? '手稿 ' + ch.num + ' ·《无岸之河》' : '第' + ch.num + '章';
+                    const label = ch.manuscript ? '回忆 ' + ch.num' : '第' + ch.num + '章';
                     document.getElementById('ch-indicator').textContent = label + ' · ' + ch.title;
                     buildNav();
                     if (push) history.pushState({ ch: num }, '', '#chapter-' + num);
@@ -276,7 +276,7 @@
                 contentEl.className = 'content' + (ch.manuscript ? ' manuscript-content' : '');
                 document.getElementById('reader').classList.add('active');
                 document.body.classList.add('reading');
-                const label = ch.manuscript ? '手稿 ' + ch.num + ' ·《无岸之河》' : '第' + ch.num + '章';
+                const label = ch.manuscript ? '回忆 ' + ch.num' : '第' + ch.num + '章';
                 document.getElementById('ch-indicator').textContent = label + ' · ' + ch.title;
                 buildNav();
                 if (push && location.hash !== '#chapter-' + num) history.pushState({ ch: num }, '', '#chapter-' + num);
