@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>叙事因果律 - Narrative Causality</title>
+    <meta name="description" content="是否存在一种文明，发展到可以太空旅行，但没有数的概念？一个关于语言、认知与真正的他者的科幻故事。">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f1318;
+            --bg-light: #f5f3ee;
+            --text: #d5dbe0;
+            --text-light: #2c2c2c;
+            --text-dim: #6a7a8a;
+            --accent: #5a7a9a;
+            --accent2: #9a8a5a;
+            --border: #2a3040;
+            --border-light: #ddd8cf;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Noto Serif SC', 'Songti SC', serif;
+            line-height: 1.8;
+            background: var(--bg);
+            color: var(--text);
+            transition: background 0.3s, color 0.3s;
+        }
+        body.light { background: var(--bg-light); color: var(--text-light); }
+        .hero {
+            min-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(180deg, #060a0f 0%, var(--bg) 100%);
+        }
+        body.light .hero { background: linear-gradient(180deg, #e8e4df 0%, var(--bg-light) 100%); }
+        .title {
+            font-family: 'ZCOOL XiaoWei', 'Noto Serif SC', serif;
+            font-size: clamp(3rem, 12vw, 8rem);
+            font-weight: 400;
+            letter-spacing: 0.4em;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+        body.light .title { color: #2c2c2c; }
+        .title-en { font-size: 0.85rem; letter-spacing: 0.5em; text-transform: uppercase; color: #4a5a6a; margin-bottom: 50px; }
+        .tagline { font-size: 1.15rem; color: var(--text-dim); max-width: 520px; line-height: 2.2; margin-bottom: 60px; }
+        .start-btn {
+            display: inline-block;
+            padding: 18px 60px;
+            border: 1px solid #3a4a5a;
+            color: #8a9aaa;
+            text-decoration: none;
+            font-size: 1rem;
+            letter-spacing: 0.15em;
+            transition: all 0.3s;
+            background: transparent;
+        }
+        .start-btn:hover { background: #fff; color: #000; border-color: #fff; }
+        body.light .start-btn { border-color: #999; color: #666; }
+        body.light .start-btn:hover { background: #2c2c2c; color: #fff; border-color: #2c2c2c; }
+        .toc { max-width: 800px; margin: 0 auto; padding: 80px 20px; }
+        .toc-title { text-align: center; font-size: 1.3rem; letter-spacing: 0.4em; color: var(--text-dim); margin-bottom: 50px; }
+        .part-header { padding: 30px 0 10px; font-size: 0.9rem; letter-spacing: 0.3em; color: var(--accent); text-transform: uppercase; border-bottom: none; }
+        .chapter-list { display: flex; flex-direction: column; }
+        .chapter-link {
+            display: flex;
+            align-items: center;
+            padding: 22px 0;
+            border-bottom: 1px solid var(--border);
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.2s;
+            gap: 15px;
+        }
+        body.light .chapter-link { border-bottom-color: var(--border-light); }
+        .chapter-link:hover { padding-left: 15px; color: var(--accent); }
+        .chapter-link.manuscript { background: rgba(154, 138, 90, 0.06); margin: 0 -20px; padding-left: 20px; padding-right: 20px; }
+        .chapter-link.manuscript:hover { padding-left: 35px; color: var(--accent2); }
+        .chapter-link.upcoming { opacity: 0.35; pointer-events: none; }
+        .ch-num { font-size: 0.85rem; color: var(--text-dim); min-width: 90px; }
+        .chapter-link.manuscript .ch-num { color: var(--accent2); }
+        .ch-title { font-size: 1.1rem; flex: 1; }
+        .ch-preview { font-size: 0.9rem; color: var(--text-dim); max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ch-status { font-size: 0.75rem; color: var(--text-dim); padding: 3px 10px; border: 1px solid var(--border); border-radius: 12px; }
+        .reader { display: none; min-height: 100vh; }
+        .reader.active { display: block; }
+        .toolbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 25px;
+            background: rgba(15, 19, 24, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+        }
+        body.light .toolbar { background: rgba(245, 243, 238, 0.95); border-bottom-color: var(--border-light); }
+        .toolbar-left { display: flex; align-items: center; gap: 20px; }
+        .back-link { color: var(--text-dim); text-decoration: none; font-size: 0.9rem; }
+        .back-link:hover { color: var(--text); }
+        body.light .back-link:hover { color: var(--text-light); }
+        .ch-indicator { font-size: 0.85rem; color: #4a5a6a; }
+        .toolbar-right { display: flex; gap: 12px; }
+        .tool-btn {
+            width: 38px; height: 38px;
+            border: 1px solid var(--border); border-radius: 50%;
+            background: transparent; color: var(--text-dim);
+            cursor: pointer; font-size: 0.9rem;
+        }
+        .tool-btn:hover { border-color: var(--text-dim); color: var(--text); }
+        body.light .tool-btn { border-color: var(--border-light); }
+        body.light .tool-btn:hover { border-color: #999; color: var(--text-light); }
+        .progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--accent); z-index: 101; }
+        .content-wrap { max-width: 700px; margin: 0 auto; padding: 100px 30px 80px; }
+        .content { font-size: 1.15rem; line-height: 2.3; letter-spacing: 0.02em; }
+        .content h1, .content h2 { font-size: 1.5rem; font-weight: 500; margin-bottom: 50px; padding-bottom: 25px; border-bottom: 1px solid var(--border); letter-spacing: 0.08em; }
+        body.light .content h1, body.light .content h2 { border-bottom-color: var(--border-light); }
+        .content p { margin-bottom: 1.6em; text-indent: 2em; }
+        .content blockquote { margin: 2em 0; padding: 1.2em 1.8em; background: rgba(255,255,255,0.02); border-left: 3px solid var(--accent); text-indent: 0; }
+        body.light .content blockquote { background: rgba(0,0,0,0.02); }
+        .content.manuscript-content blockquote { border-left-color: var(--accent2); }
+        .content strong { font-weight: 500; color: var(--accent); }
+        .content.manuscript-content strong { color: var(--accent2); }
+        .content hr { border: none; height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 50px 0; }
+        body.light .content hr { background: linear-gradient(90deg, transparent, var(--border-light), transparent); }
+        .bottom-nav { display: flex; justify-content: space-between; gap: 15px; margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); }
+        body.light .bottom-nav { border-top-color: var(--border-light); }
+        .nav-item { flex: 1; padding: 18px; text-decoration: none; color: inherit; border: 1px solid var(--border); transition: all 0.2s; }
+        body.light .nav-item { border-color: var(--border-light); }
+        .nav-item:hover { background: rgba(255,255,255,0.02); border-color: #4a5a6a; }
+        body.light .nav-item:hover { background: rgba(0,0,0,0.02); border-color: #bbb; }
+        .nav-item.prev { text-align: left; }
+        .nav-item.next { text-align: right; }
+        .nav-item.home { flex: 0.5; text-align: center; }
+        .nav-item.disabled { opacity: 0.3; pointer-events: none; }
+        .nav-label { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 6px; letter-spacing: 0.1em; }
+        .nav-title { font-size: 0.95rem; }
+        .font-popup { position: fixed; top: 55px; right: 25px; background: #1a2030; border: 1px solid var(--border); padding: 15px 20px; border-radius: 8px; display: none; z-index: 102; }
+        body.light .font-popup { background: #fff; border-color: var(--border-light); box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .font-popup.show { display: block; }
+        .font-slider { width: 140px; accent-color: var(--accent); }
+        footer { text-align: center; padding: 50px 20px; color: #4a5a6a; font-size: 0.85rem; }
+        body.reading .main-view { display: none; }
+        @media (max-width: 768px) {
+            .hero { min-height: 70vh; }
+            .chapter-link { flex-wrap: wrap; gap: 8px; padding: 18px 0; }
+            .ch-preview { display: none; }
+            .content-wrap { padding: 90px 20px 120px; }
+            .content { font-size: 1.05rem; line-height: 2.1; }
+            .bottom-nav { flex-direction: column; margin-bottom: 40px; }
+            .nav-item { text-align: center !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-view">
+        <section class="hero">
+            <h1 class="title">叙事因果律</h1>
+            <p class="title-en">Narrative Causality</p>
+            <p class="tagline">
+                是否存在一种文明，发展到可以太空旅行，<br>
+                但没有整数甚至没有"数"的概念？<br><br>
+                一个关于认知、暴力与真正的他者的故事。
+            </p>
+            <a href="#toc" class="start-btn">开始阅读</a>
+        </section>
+        <section class="toc" id="toc">
+            <h2 class="toc-title">目 录</h2>
+            <div class="chapter-list" id="chapter-list"></div>
+        </section>
+        <footer><p>《叙事因果律》 · 2026</p></footer>
+    </div>
+    <div class="reader" id="reader">
+        <div class="progress" id="progress"></div>
+        <div class="toolbar">
+            <div class="toolbar-left">
+                <a href="#" class="back-link" onclick="goHome(); return false;">← 目录</a>
+                <span class="ch-indicator" id="ch-indicator"></span>
+            </div>
+            <div class="toolbar-right">
+                <button class="tool-btn" onclick="toggleFont()" title="字号">A</button>
+                <button class="tool-btn" onclick="toggleTheme()" title="主题" id="theme-btn">☀</button>
+            </div>
+        </div>
+        <div class="font-popup" id="font-popup">
+            <input type="range" class="font-slider" min="14" max="24" value="18" onchange="setFont(this.value)">
+        </div>
+        <div class="content-wrap">
+            <div class="content" id="content"></div>
+            <div class="bottom-nav" id="bottom-nav"></div>
+        </div>
+    </div>
+    <script>
+        const chapters = [
+            { num: "1",    file: "chapters/1.md",    title: "仪器故障",   preview: "深空探测器网络报告异常。",           part: "Part I · 噪声" },
+            { num: "2",    file: "chapters/2.md",    title: "非局域",     preview: "后面发生的事情会影响前面的意义。",     part: null },
+            { num: "2.5",  file: "chapters/2.5.md",  title: "河",         preview: "镇上有条河，美但怪异。",             part: null, manuscript: true },
+            { num: "3",    file: "chapters/3.md",    title: "强语境敏感", preview: "测量结果不应取决于你阅读的顺序。",     part: null },
+            { num: "4",    file: "chapters/4.md",    title: "出发",       preview: "飞船载着五个不同的认知世界出发了。",   part: "Part II · 航行" },
+            { num: "5",    file: "chapters/5.md",    title: "死讯",       preview: "收到消息时，她已经走了几天了。",       part: null },
+            { num: "5.5",  file: "chapters/5.5.md",  title: "倾听",       preview: "河是活的。不是生物学意义上的活。",     part: null, manuscript: true },
+            { num: "6",    file: "chapters/6.md",    title: "接近",       preview: "数据会因为谁在读而变化。",             part: null },
+            { num: "6.5",  file: "chapters/6.5.md",  title: "丈量",       preview: "每一次测量似乎都在伤害河。",           part: null, manuscript: true },
+            { num: "7",    file: "chapters/7.md",    title: "边界",       preview: "现实开始表现出叙事性。",               part: "Part III · 接触" },
+            { num: "8",    file: "chapters/8.md",    title: "暴力",       preview: "有什么东西在被伤害。",                 part: null },
+            { num: "8.5",  file: "chapters/8.5.md",  title: "裂缝",       preview: "河开始讲一个大坝从未建造的故事。",     part: null, manuscript: true },
+            { num: "9",    file: "chapters/9.md",    title: "母语",       preview: "他逃了一辈子的东西，是唯一的桥梁。",   part: null },
+            { num: "10",   file: "chapters/10.md",   title: "翻译",       preview: "翻译本身就是切割和命名的行为。",       part: "Part IV · 抉择" },
+            { num: "10.5", file: "chapters/10.5.md", title: "河岸",       preview: "手稿在这里断了——中间一个句子。",       part: null, manuscript: true },
+            { num: "11",   file: "chapters/11.md",   title: "代价",       preview: "他踏入了母亲没踏入的河流。",           part: null },
+            { num: "12",   file: "chapters/12.md",   title: "未完",       preview: "他写下了母亲手稿的结局。",             part: null }
+        ];
+        let current = null;
+        let light = localStorage.getItem('nc-theme') === 'light';
+        let fontSize = parseInt(localStorage.getItem('nc-fontSize')) || 18;
+        
+        if (light) document.body.classList.add('light');
+        document.getElementById('theme-btn').textContent = light ? '☾' : '☀';
+        
+        const list = document.getElementById('chapter-list');
+        chapters.forEach(function(ch) {
+            if (ch.part) {
+                const ph = document.createElement('div');
+                ph.className = 'part-header';
+                ph.textContent = ch.part;
+                list.appendChild(ph);
+            }
+            const a = document.createElement('a');
+            a.href = '#chapter-' + ch.num;
+            let cls = 'chapter-link';
+            if (ch.manuscript) cls += ' manuscript';
+            if (!ch.ready) cls += ' upcoming';
+            a.className = cls;
+            const label = ch.manuscript ? '手稿 ' + ch.num : '第' + ch.num.replace('.5','') + '章';
+            const statusHtml = ch.ready ? '' : '<span class="ch-status">待写</span>';
+            a.innerHTML = '<span class="ch-num">' + label + '</span><span class="ch-title">' + ch.title + '</span><span class="ch-preview">' + ch.preview + '</span>' + statusHtml;
+            list.appendChild(a);
+        });
+        
+        async function load(num, push) {
+            if (push === undefined) push = true;
+            current = num;
+            const ch = chapters.find(function(c) { return c.num === String(num); });
+            if (!ch) return;
+            try {
+                const res = await fetch(ch.file);
+                if (!res.ok) {
+                    document.getElementById('content').innerHTML = '<h1>' + ch.title + '</h1><p style="text-indent:0; color: var(--text-dim);">这一章还在写……</p>';
+                    document.getElementById('reader').classList.add('active');
+                    document.body.classList.add('reading');
+                    const label = ch.manuscript ? '手稿 ' + ch.num + ' ·《无岸之河》' : '第' + ch.num + '章';
+                    document.getElementById('ch-indicator').textContent = label + ' · ' + ch.title;
+                    buildNav();
+                    if (push) history.pushState({ ch: num }, '', '#chapter-' + num);
+                    scrollTo(0, 0);
+                    return;
+                }
+                const md = await res.text();
+                let html = md
+                    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+                    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+                    .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
+                    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/^---$/gm, '<hr>')
+                    .replace(/^(.+)$/gm, function(m) { return m.startsWith('<') || !m.trim() ? m : '<p>' + m + '</p>'; })
+                    .replace(/<p><\/p>/g, '');
+                const contentEl = document.getElementById('content');
+                contentEl.innerHTML = html;
+                contentEl.style.fontSize = fontSize + 'px';
+                contentEl.className = 'content' + (ch.manuscript ? ' manuscript-content' : '');
+                document.getElementById('reader').classList.add('active');
+                document.body.classList.add('reading');
+                const label = ch.manuscript ? '手稿 ' + ch.num + ' ·《无岸之河》' : '第' + ch.num + '章';
+                document.getElementById('ch-indicator').textContent = label + ' · ' + ch.title;
+                buildNav();
+                if (push && location.hash !== '#chapter-' + num) history.pushState({ ch: num }, '', '#chapter-' + num);
+                scrollTo(0, 0);
+                updateProgress();
+            } catch (e) { console.error(e); }
+        }
+        
+        function buildNav() {
+            const idx = chapters.findIndex(function(c) { return c.num === String(current); });
+            const prev = idx > 0 ? chapters[idx - 1] : null;
+            const next = idx < chapters.length - 1 ? chapters[idx + 1] : null;
+            let html = '<a href="#" class="nav-item prev ' + (!prev ? 'disabled' : '') + '" onclick="' + (prev ? "load('" + prev.num + "'); return false;" : "return false;") + '"><div class="nav-label">上一章</div><div class="nav-title">' + (prev ? prev.title : '—') + '</div></a>';
+            html += '<a href="#" class="nav-item home" onclick="goHome(); return false;"><div class="nav-label">返回</div><div class="nav-title">目录</div></a>';
+            html += '<a href="#" class="nav-item next ' + (!next ? 'disabled' : '') + '" onclick="' + (next ? "load('" + next.num + "'); return false;" : "return false;") + '"><div class="nav-label">下一章</div><div class="nav-title">' + (next ? next.title : '—') + '</div></a>';
+            document.getElementById('bottom-nav').innerHTML = html;
+        }
+        
+        function goHome() {
+            document.getElementById('reader').classList.remove('active');
+            document.body.classList.remove('reading');
+            history.pushState(null, '', location.pathname);
+            scrollTo(0, 0);
+        }
+        
+        function toggleTheme() {
+            light = !light;
+            document.body.classList.toggle('light', light);
+            document.getElementById('theme-btn').textContent = light ? '☾' : '☀';
+            localStorage.setItem('nc-theme', light ? 'light' : 'dark');
+        }
+        
+        function toggleFont() { document.getElementById('font-popup').classList.toggle('show'); }
+        function setFont(size) {
+            fontSize = parseInt(size);
+            document.getElementById('content').style.fontSize = fontSize + 'px';
+            localStorage.setItem('nc-fontSize', fontSize);
+        }
+        
+        function updateProgress() {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            document.getElementById('progress').style.width = (docHeight > 0 ? (scrollTop / docHeight) * 100 : 0) + '%';
+        }
+        
+        window.addEventListener('scroll', function() { if (document.body.classList.contains('reading')) updateProgress(); });
+        window.addEventListener('popstate', function(e) {
+            if (e.state && e.state.ch) load(e.state.ch, false);
+            else { document.getElementById('reader').classList.remove('active'); document.body.classList.remove('reading'); }
+        });
+        function handleHash() { const m = location.hash.match(/^#chapter-([\d.]+)$/); if (m) load(m[1], false); }
+        window.addEventListener('hashchange', handleHash);
+        document.addEventListener('click', function(e) { if (!e.target.closest('.font-popup') && !e.target.closest('.tool-btn')) document.getElementById('font-popup').classList.remove('show'); });
+        handleHash();
+    </script>
+</body>
+</html>
