@@ -85,6 +85,9 @@
         .chapter-link.manuscript { background: rgba(154, 138, 90, 0.06); margin: 0 -20px; padding-left: 20px; padding-right: 20px; }
         .chapter-link.manuscript:hover { padding-left: 35px; color: var(--accent2); }
         .chapter-link.upcoming { opacity: 0.35; pointer-events: none; }
+        .chapter-link.outline-link { border-bottom: 2px solid var(--accent2); margin-bottom: 10px; }
+        .chapter-link.outline-link .ch-num { font-size: 1.1rem; }
+        .chapter-link.outline-link:hover { color: var(--accent2); }
         .ch-num { font-size: 0.85rem; color: var(--text-dim); min-width: 90px; }
         .chapter-link.manuscript .ch-num { color: var(--accent2); }
         .ch-title { font-size: 1.1rem; flex: 1; }
@@ -127,6 +130,12 @@
         .content.manuscript-content blockquote { border-left-color: var(--accent2); }
         .content strong { font-weight: 500; color: var(--accent); }
         .content.manuscript-content strong { color: var(--accent2); }
+        .content h3 { font-size: 1.2rem; font-weight: 500; margin: 40px 0 20px; color: var(--accent); letter-spacing: 0.05em; }
+        .content table { border: 1px solid var(--border); }
+        .content td { padding: 8px 12px; border: 1px solid var(--border); vertical-align: top; }
+        .content tr:first-child td { font-weight: 500; background: rgba(255,255,255,0.03); }
+        body.light .content td { border-color: var(--border-light); }
+        body.light .content tr:first-child td { background: rgba(0,0,0,0.03); }
         .content hr { border: none; height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 50px 0; }
         body.light .content hr { background: linear-gradient(90deg, transparent, var(--border-light), transparent); }
         .bottom-nav { display: flex; justify-content: space-between; gap: 15px; margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); }
@@ -169,6 +178,7 @@
                 一个关于认知、暴力与真正的他者的故事。
             </p>
             <a href="#toc" class="start-btn">开始阅读</a>
+            <a href="#chapter-outline" class="start-btn" style="margin-left: 20px; border-color: var(--accent2); color: var(--accent2);">阅读大纲</a>
         </section>
         <section class="toc" id="toc">
             <h2 class="toc-title">目 录</h2>
@@ -198,6 +208,7 @@
     </div>
     <script>
         const chapters = [
+            { num: "outline", file: "chapters/outline.md", title: "章节大纲", preview: "12 主章 + 5 回忆间章，四幕结构。", part: null, outline: true },
             { num: "1",    file: "chapters/1.md",    title: "仪器故障",   preview: "深空探测器网络报告异常。",           part: "Part I · 噪声" },
             { num: "2",    file: "chapters/2.md",    title: "非局域",     preview: "后面发生的事情会影响前面的意义。",     part: null },
             { num: "2.5",  file: "chapters/2.5.md",  title: "睡前故事",   preview: "不对，这个人不会这么说话。",         part: null, manuscript: true },
@@ -235,10 +246,11 @@
             a.href = '#chapter-' + ch.num;
             let cls = 'chapter-link';
             if (ch.manuscript) cls += ' manuscript';
-            if (!ch.ready) cls += ' upcoming';
+            if (ch.outline) cls += ' outline-link';
+            if (!ch.ready && !ch.outline) cls += ' upcoming';
             a.className = cls;
-            const label = ch.manuscript ? '回忆 ' + ch.num : '第' + ch.num.replace('.5','') + '章';
-            const statusHtml = ch.ready ? '' : '<span class="ch-status">待写</span>';
+            const label = ch.outline ? '📋' : ch.manuscript ? '回忆 ' + ch.num : '第' + ch.num.replace('.5','') + '章';
+            const statusHtml = ch.ready ? '' : ch.outline ? '' : '<span class="ch-status">待写</span>';
             a.innerHTML = '<span class="ch-num">' + label + '</span><span class="ch-title">' + ch.title + '</span><span class="ch-preview">' + ch.preview + '</span>' + statusHtml;
             list.appendChild(a);
         });
@@ -254,7 +266,7 @@
                     document.getElementById('content').innerHTML = '<h1>' + ch.title + '</h1><p style="text-indent:0; color: var(--text-dim);">这一章还在写……</p>';
                     document.getElementById('reader').classList.add('active');
                     document.body.classList.add('reading');
-                    const label = ch.manuscript ? '回忆 ' + ch.num' : '第' + ch.num + '章';
+                    const label = ch.outline ? '📋 大纲' : ch.manuscript ? '回忆 ' + ch.num : '第' + ch.num + '章';
                     document.getElementById('ch-indicator').textContent = label + ' · ' + ch.title;
                     buildNav();
                     if (push) history.pushState({ ch: num }, '', '#chapter-' + num);
@@ -263,10 +275,21 @@
                 }
                 const md = await res.text();
                 let html = md
-                    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+                    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
                     .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+                    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
                     .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
                     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                    .replace(/^- \[ \] (.+)$/gm, '<p style="text-indent:0">☐ $1</p>')
+                    .replace(/^- \[x\] (.+)$/gm, '<p style="text-indent:0">☑ $1</p>')
+                    .replace(/^[•\-] (.+)$/gm, '<p style="text-indent:0; padding-left:1.5em;">· $1</p>')
+                    .replace(/^\|.+\|$/gm, function(row) {
+                        if (/^\|[\s\-:|]+\|$/.test(row)) return '';
+                        var cells = row.split('|').filter(function(c,i,a){return i>0&&i<a.length-1;});
+                        return '<tr>' + cells.map(function(c){return '<td>'+c.trim()+'</td>';}).join('') + '</tr>';
+                    })
+                    .replace(/((?:<tr>.*<\/tr>\n?)+)/g, '<table style="width:100%;border-collapse:collapse;margin:1.5em 0;font-size:0.95em;">$1</table>')
                     .replace(/^---$/gm, '<hr>')
                     .replace(/^(.+)$/gm, function(m) { return m.startsWith('<') || !m.trim() ? m : '<p>' + m + '</p>'; })
                     .replace(/<p><\/p>/g, '');
@@ -276,7 +299,7 @@
                 contentEl.className = 'content' + (ch.manuscript ? ' manuscript-content' : '');
                 document.getElementById('reader').classList.add('active');
                 document.body.classList.add('reading');
-                const label = ch.manuscript ? '回忆 ' + ch.num' : '第' + ch.num + '章';
+                const label = ch.outline ? '📋 大纲' : ch.manuscript ? '回忆 ' + ch.num : '第' + ch.num + '章';
                 document.getElementById('ch-indicator').textContent = label + ' · ' + ch.title;
                 buildNav();
                 if (push && location.hash !== '#chapter-' + num) history.pushState({ ch: num }, '', '#chapter-' + num);
