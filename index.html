@@ -350,7 +350,7 @@
             if (e.state && e.state.ch) load(e.state.ch, false);
             else { document.getElementById('reader').classList.remove('active'); document.body.classList.remove('reading'); }
         });
-        function handleHash() { const m = location.hash.match(/^#chapter-([\d.]+)$/); if (m) load(m[1], false); }
+        function handleHash() { const m = location.hash.match(/^#chapter-([\w.]+)$/); if (m) load(m[1], false); }
         window.addEventListener('hashchange', handleHash);
         document.addEventListener('click', function(e) { if (!e.target.closest('.font-popup') && !e.target.closest('.tool-btn')) document.getElementById('font-popup').classList.remove('show'); });
         handleHash();
